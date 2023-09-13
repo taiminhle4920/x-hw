@@ -29,10 +29,11 @@ def make_tweet_fn(text):
     return response.json()
 
 
-def get_tweet_fn(id:str):
+def get_tweet_fn(params):
     print("\n in get tweet fn \n")
-    print("the id is ", id)
-    response = oauth.get("https://api.twitter.com/2/tweets/{}".format(id))
+    print("the id is ", params)
+    response = oauth.get(
+    "https://api.twitter.com/2/tweets", params=params)
     return response.json()
 
 def delete_tweet_fn(id:str):
@@ -59,7 +60,7 @@ def create_tweet():
 def get_tweet():
     tweetId = str(request.args.get("tweetId"))
     print(tweetId)
-    response = get_tweet_fn(tweetId)
+    response = get_tweet_fn({"id": tweetId,"tweet.fields": "created_at"})
     return response
 
 
