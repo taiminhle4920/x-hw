@@ -13,18 +13,6 @@ function make_tweet(){
         .then(result => document.getElementById('result').textContent = result);
 }
 
-function get_tweet() {
-    const tweetId = document.getElementById('search_id').value;
-    
-    fetch(`/get?tweetId=${tweetId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-        .then(response => response.text())
-        .then(result => document.getElementById('result').textContent = result);
-}
 
 function delete_tweet() {
     const tweetId = document.getElementById('delete_id').value;
