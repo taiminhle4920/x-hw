@@ -21,13 +21,16 @@ oauth = OAuth1Session(
 
 
 def make_tweet_fn(text):
-
     response = oauth.post("https://api.twitter.com/2/tweets",json=text)
     return response.json()
 
 
 def delete_tweet_fn(id:str):
     response = oauth.delete("https://api.twitter.com/2/tweets/{}".format(id))
+    if response.status_code == 400:
+        return jsonify({"error":"tweetID not found"})
+    elif response.status_code == 200:
+        return jsonify({"success":"tweet deleted"})
     return response.json()
 
 
@@ -40,6 +43,8 @@ def index():
 def create_tweet():
     text = str(request.data)
     content = text[7:len(text)-1]
+    if len(content) == 0:
+        return jsonify({"error":"content is empty"})
     response = make_tweet_fn({'text':content})
     return response
 
@@ -47,6 +52,8 @@ def create_tweet():
 @app.route("/delete", methods=["DELETE"])
 def delete_tweet():
     tweetId = request.args.get("tweetId")
+    if len(tweetId) == 0:
+        return jsonify({"error":"tweetId is empty"})
     response = delete_tweet_fn(tweetId)
     return response
 
