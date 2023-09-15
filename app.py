@@ -23,8 +23,8 @@ oauth = OAuth1Session(
 
 
 def make_tweet_fn(text):
-    print("\n in make tweet fn \n")
-    print(text)
+    # print("\n in make tweet fn \n")
+    #print(text)
     response = oauth.post("https://api.twitter.com/2/tweets",json=text)
     return response.json()
 
