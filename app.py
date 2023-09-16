@@ -28,9 +28,9 @@ def make_tweet_fn(text):
 def delete_tweet_fn(id:str):
     response = oauth.delete("https://api.twitter.com/2/tweets/{}".format(id))
     if response.status_code == 400:
-        return jsonify({"error":"tweetID not found"})
+        return {"error":"tweetID not found"}
     elif response.status_code == 200:
-        return jsonify({"success":"tweet deleted"})
+        return {"success":"tweet deleted"}
     return response.json()
 
 

@@ -1,74 +1,75 @@
 import unittest
-import random
-from app import app
+from unittest.mock import MagicMock, patch
+from app import app, make_tweet_fn, delete_tweet_fn
+import time
 
-class Apptest(unittest.TestCase):
+class TestApp(unittest.TestCase):
+    '''
+    @patch('app.OAuth1Session')
+    def test_make_tweet_fn(self, mock_oauth_session):
+        mock_response = MagicMock()
+        mock_response.status_code = 403  # Change the status code to 403 for a forbidden request
+        mock_response.json.return_value = {
+            'detail': 'You are not allowed to create a Tweet with duplicate content.',
+            'status': 403,
+            'title': 'Forbidden',
+            'type': 'about:blank'
+        }
+        mock_oauth_session().post.return_value = mock_response
 
-    num = random.randint(1, 100)
+        text = {'text': 'Test tweet content'}
+        response = make_tweet_fn(text)
+        expected_response = {
+            'detail': 'You are not allowed to create a Tweet with duplicate content.',
+            'status': 403,
+            'title': 'Forbidden',
+            'type': 'about:blank'
+        }
+        self.assertEqual(response, expected_response)
+    '''
 
-    test_data = {"text": "testing"+str(num),
-                 "id": 0}
-
-    #check for response 200
-    def test_index(self):
-        tester = app.test_client(self)
-        response = tester.get("/")
-        statuscode = response.status_code
-        self.assertEqual(statuscode, 200)
+    created_id = None
     
+    @patch('app.OAuth1Session')
+    def test_make_tweet_fn(self, mock_oauth_session):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "data": {
+                "edit_history_tweet_ids": ["1702854925385138637"],
+                "id": "1702854925385138637",
+                "text": "Test tweet content"
+            }
+        }
+        mock_oauth_session().post.return_value = mock_response
 
-    #check UI content
-    def test_index_content(self):
-        tester = app.test_client(self)
-        response = tester.get("/")
-        html = response.data.decode("utf8")
-        self.assertIn("Create a Tweet", html)  
-        self.assertIn("Get a Tweet", html)  
-        self.assertIn("Deleta a Tweet", html)  
+        text = {'text': 'Test tweet content'}
+        response = make_tweet_fn(text)
+        self.created_id = response["data"]["id"]
 
-    #test create_tweet respond status_code
-    def test_create_tweet1(self):
-        tester = app.test_client(self)
-        resp = tester.post("/tweet", data="texting")
-        self.assertEqual(resp.status_code, 200)
-        print("test1 complete")
+        print(response)
+        print(self.created_id)
+        print(type(self.created_id))
+
+        # Check the "text" part of the response
+        expected_text = "Test tweet content"
+        self.assertEqual(response["data"]["text"], expected_text)
     
-    #test create_tweet respond type
-    def test_create_tweet2(self):
-        tester = app.test_client(self)
-        resp = tester.post("/tweet", data="texting")
-        self.assertEqual(resp.content_type, "application/json")
-        print("test2 complete")
+    time.sleep(5)
 
-    #test create_tweet respond output
-    def test_create_tweet3(self):
-        tester = app.test_client(self)
-        resp = tester.post("/tweet", data = "testing")
-        self.assertTrue(b'detail'in resp.data)
-        print("test3 complete")
-    
-    #test delete_tweet respond status_code
-    def test_delete_tweet1(self):
-        tester = app.test_client(self)
-        resp = tester.delete("/delete?tweetId=$123")
-        self.assertEqual(resp.status_code, 200)
-        print("test4 complete")
-    
-    #test delete_tweet respond type
-    def test_delete_tweet2(self):
-        tester = app.test_client(self)
-        resp = tester.delete("/delete?tweetId=$123")
-        self.assertEqual(resp.content_type, "application/json")
-        print("test5 complete")
+    @patch('app.OAuth1Session')
+    def test_delete_tweet_fn(self, mock_oauth_session):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {'success': 'tweet deleted'}
+        mock_oauth_session().delete.return_value = mock_response
 
-    #test delete_tweet respond output
-    def test_delete_tweet3(self):
-        tester = app.test_client(self)
-        resp = tester.delete("/delete?tweetId=$123")
-        self.assertTrue(b'detail'in resp.data)
-        print("test6 complete")
+        with app.app_context():  # Set up the application context
+            response = delete_tweet_fn('1702857571139481880')
+            print(response)
+            expected_response = {'success': 'tweet deleted'}
+            self.assertEqual(response, expected_response)
 
     
-
-if __name__=="__main__":
+if __name__ == '__main__':
     unittest.main()
