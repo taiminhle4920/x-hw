@@ -1,5 +1,6 @@
 
 
+// code by Tai
 function make_tweet(){
     const text = document.getElementById("tweet_text").value;
     console.log(text);
@@ -13,6 +14,7 @@ function make_tweet(){
         .then(result => document.getElementById('result').textContent = result);
 }
 
+// code by Tai
 
 function delete_tweet() {
     const tweetId = document.getElementById('delete_id').value;
