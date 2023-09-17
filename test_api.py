@@ -3,6 +3,7 @@ import random
 from app import app
 import json
 
+#code by Haoming
 class Apptest(unittest.TestCase):
 
     test_data = {"text": "tweet"+str(random.randint(1, 10000)),
