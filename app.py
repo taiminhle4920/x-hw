@@ -19,11 +19,12 @@ oauth = OAuth1Session(
     resource_owner_secret=access_token_secret,
 )
 
-
+# code by Tai
 def make_tweet_fn(text):
     response = oauth.post("https://api.twitter.com/2/tweets",json=text)
     return response.json()
 
+# code by Tai
 
 def delete_tweet_fn(id:str):
     response = oauth.delete("https://api.twitter.com/2/tweets/{}".format(id))
@@ -33,11 +34,13 @@ def delete_tweet_fn(id:str):
         return jsonify({"success":"tweet deleted"})
     return response.json()
 
+# code by Tai
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# code by Tai
 
 @app.route("/tweet", methods=["POST"])
 def create_tweet():
@@ -48,6 +51,7 @@ def create_tweet():
     response = make_tweet_fn({'text':content})
     return response
 
+# code by Tai
 
 @app.route("/delete", methods=["DELETE"])
 def delete_tweet():
